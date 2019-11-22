@@ -50,3 +50,18 @@ A diretiva router-outlet como grande lacuna para exibição de outros componente
 Módulo de rotas e definição de rotas
 Como lidar com páginas 404
 Parametrizando rotas e como obter valores do segmento parametrizado
+
+
+--------------------------------------------------------------------------------------------------------
+
+05 - Novo componente, novos conceitos
+
+Tópicos abordados no capítulo:
+
+Novo componente para listar photos
+Adequação dos dados recebidos pelo componente
+Quando a fase OnInit não é suficiente
+A interface OnChanges, e como interagir com SimpleChanges
+
+--------------------------------------------------------------------------------------------------------
+

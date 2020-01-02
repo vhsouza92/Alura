@@ -1,28 +1,50 @@
-import { Component, OnInit } from '@angular/core';
-import { PhotoService } from '../photo/photo.service';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { debounceTime } from 'rxjs/operators';
+
+import { Photo } from '../photo/photo';
+import { Subject } from 'rxjs';
+import { PhotoService } from '../photo/photo.service';
 
 @Component({
   selector: 'ap-photo-list',
   templateUrl: './photo-list.component.html',
   styleUrls: ['./photo-list.component.css']
 })
-export class PhotoListComponent implements OnInit {
-
-  photos: any[] = [];
+export class PhotoListComponent implements OnInit, OnDestroy {
+  
+  photos: Photo[] = [];
+  filter = '';
+  debounce: Subject<string> = new Subject<string>();
+  hasMore: boolean = true;
+  currentPage: number = 1;
+  userName: string = '';
   
   constructor(
-    private PhotoService: PhotoService,
-    private activateRoute: ActivatedRoute
+    private activateRoute: ActivatedRoute,
+    private photoService: PhotoService
     ){}
   
-  ngOnInit(): void{
-    
-    const userName = this.activateRoute.snapshot.params.userName;
-
-    this.PhotoService
-      .listFromUser(userName)
-      .subscribe(photos => this.photos = photos, error => alert("DEU MERDA") );
+    ngOnInit(): void {
+      this.userName = this.activateRoute.snapshot.params.userName;
+      this.photos = this.activateRoute.snapshot.data['photos'];
+      this.debounce
+          .pipe(debounceTime(300))
+          .subscribe(filter => this.filter = filter);
+  }
+  
+  ngOnDestroy(): void {
+    this.debounce.unsubscribe(); 
   }
 
+  load() {
+    this.photoService
+        .listFromUserPaginated(this.userName, ++this.currentPage)
+        .subscribe(photos => {
+            this.photos = this.photos.concat(photos)
+            if(!photos.length) this.hasMore = false;
+        });
+
+  }
+  
 }
